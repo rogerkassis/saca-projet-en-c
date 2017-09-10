@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <malloc.h>
+#include <pthread.h>
+#include "saca.h"
+#include "controleur.h"
+
+int main(int argc, char const *argv[])
+{   
+
+while (1)
+{
+  pthread_t connect;
+  pthread_create(&connect, NULL, connecter_avions, NULL);
+  nomAvions = (char**)malloc(sizeof(char*)*300);
+  avions = (AvionSaca*)malloc(sizeof(AvionSaca)*300);
+  pthread_t connectControlleurs;
+  pthread_create(&connectControlleurs, NULL, connecter_controlleurs, NULL);
+}
+ }

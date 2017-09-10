@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <malloc.h>
+#include <pthread.h>
+#include "saca.h"
+int avionsSockets[300];
+int controlsSockets[300];
+int avionCompteur = 0;
+int contCompteur = 0;
+int ecouterAvion;
+int ecouterCont;
+
+int limit = 5;
+
+int xdif, ydif, adif;
+
+void connecter_controlleurs(void *param){
+    
+    int server_fd, new_socket, valread;
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
+    char buffer[1024] = {0};
+    pthread_t ecouter_controlleurs;
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr("194.126.31.20");
+    address.sin_port = htons( 1790 );
+    while(1)
+    {
+	if ((new_socket = accept(server_fd, (struct sockaddr *)&address,(socklen_t*)&addrlen))>0)
+	{
+
+	controlsSockets [contCompteur] = new_socket;
+	//
+        struct timeval tv; tv.tv_sec = 0; tv.tv_usec = 20000; 
+        setsockopt(new_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv,sizeof(struct timeval));
+        if (contCompteur == 0 )
+        {
+          pthread_create(&ecouter_controlleurs, NULL, ecouterControlleur, NULL); 
+        }
+	}
+    }
+}
+
+void split(char *buffer, int index, int *x, int *y, int *a, int *v,int *c)
+{
+  int vir =0;
+  int counter =0;
+  char *xx = (char*)malloc(sizeof(char)*5);
+  char *yy = (char*)malloc(sizeof(char)*5);
+  char *aa = (char*)malloc(sizeof(char)*5);
+  char *cc = (char*)malloc(sizeof(char)*5);
+  char *vv = (char*)malloc(sizeof(char)*5);
+  for(int i=index; i< strlen(buffer); i++)
+  {   
+     
+    if(buffer[i] == ',')
+    {
+      vir++;
+      counter = 0;
+    }
+    else 
+    {
+      if(vir == 1)
+      {
+	xx[counter] = buffer[i]; 
+      }
+      else if (vir == 2)
+      {
+	yy[counter] = buffer[i]; 
+      }   
+      else if (vir == 3)
+      {
+	aa[counter] = buffer[i]; 
+      }  
+      else if (vir == 4)
+      {
+	vv[counter] = buffer[i]; 
+      }   
+      else if (vir == 5)
+      {
+	cc[counter] = buffer[i]; 
+      } 
+      counter++;   
+    }
+
+  }  
+  *x=atoi(xx);
+  *y=atoi(yy);
+  *a=atoi(aa);
+  *v=atoi(vv);
+  *c=atoi(cc);
+}
+

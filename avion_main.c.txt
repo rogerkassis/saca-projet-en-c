@@ -1,0 +1,17 @@
+	#include "avion.c"
+
+int main() {
+	   
+	    initialiser_avion();
+	
+	    afficher_donnees();
+	    // on quitte si on arrive à pas contacter le gestionnaire de vols
+	    if (!ouvrir_communication()) {
+	        printf("Impossible de contacter le gestionnaire de vols");
+	        exit(1);
+	    }
+	
+	    // on se déplace une fois toutes les initialisations faites
+	    se_deplacer();
+	}
+

@@ -1,0 +1,31 @@
+#include "avion.c"
+    pthread_t depalcerAvion;
+    pthread_create(&depalcerAvion, NULL, se_deplacer, NULL);
+    
+    Void main(int argc, char const *argv[])
+    while(1)
+    {
+      lire  = read(sock, command, 1789);
+      if(lire > 0)
+      {
+        memmove(val, command+2, strlen(command));
+        
+        if(command[0] == 'a') 
+        {
+          changer_altitude(atoi(val));
+        }
+        else if(command[0] == 'c')
+        {
+          changer_cap(atoi(val)); 
+        }
+        else//v
+        {
+          changer_vitesse(atoi(val));
+        }
+      }
+    }
+
+    
+    
+}
+

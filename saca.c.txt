@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+
+struct timeval timevalue;
+timevalue.tv_sec = 0;
+timevalue.tv_usec = 30000;
+int get_avion;
+	
+typedef struct 	{  
+int num_vol,x,y,altitude,vitesse,cap;} param;
+
+param *parametres = 0;
+
+void connect(void *param){
+	
+	    int server_fd, new_socket, valread;
+	    struct sockaddr_in address;
+	    int addrlen = sizeof(address);
+	    char buffer[1024] = {0};
+	    pthread_t listenToPLanes;
+		
+	    address.sin_family = AF_INET;
+	    address.sin_addr.s_addr = inet_addr("194.126.31.20");
+	    address.sin_port = htons( 1789 );
+		
+	    int x,y,altitude,vitesse,cap;
+	    
+	    while(1)
+	    {
+		if ((new_socket = accept(server_fd, (struct sockaddr *)&address,(socklen_t*)&addrlen))> 0)
+		{
+	
+		avionsSockets[avionCompteur] = new_socket;
+	        read(new_socket,  buffer, 1024); 
+	
+	        split(buffer,6,&x,&y,&altitude,&vitesse,&cap);
+       		parametres[avionCompteur].num_vol = num_vol;
+	        parametres[avionCompteur].x = x;
+	        parametres[avionCompteur].y = y;
+	        parametres[avionCompteur].altitude = altitude;
+	        parametres[avionCompteur].vitesse = vitesse;
+	        parametres[avionCompteur].cap = cap;
+	        
+	        printf("Avion %s -> localisation : (%d,%d), altitude : %d, vitesse : %d, cap : %d\n",
+	             parametres[avionCompteur].num_vol, parametres[avionCompteur].x, parametres[avionCompteur].y,
+	             parametres[avionCompteur].altitude, parametres[avionCompteur].vitesse, parametres[avionCompteur].cap);
+	       
+	        
+	        setsockopt(new_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv,sizeof(struct timeval));
+		
+	}
+     }
+}
+
+void read(void *param)
+  {
+    int x, y, altitude, vitesse, cap;
+    char buffer[1024] = {0};
+      while(1)
+	 {
+	
+	
+	      get_avion = read(avionsSockets[i],  buffer, 1024);
+	      if(get_avion > 0)
+	      {
+	        split(buffer,6,&num_vol,&x,&y,&altitude,&vitesse,&cap);
+	        parametres[i].num_vol = num_vol;
+        	parametres[i].x = x;
+	        parametres[i].y = y;
+	        parametres[i].altitude = altitude;
+	        parametres[i].vitesse = vitesse;
+	        parametres[i].cap = cap; 
+	       
+	       printf("Avion %s -> localisation : (%d,%d), altitude : %d, vitesse : %d, cap : %d\n",
+	            parametres[i].num_vol, parametres[i].x, parametres[i].y, parametres[i].altitude, parametres[i].vitesse, parametres[i].cap);
+	      
+    }
+  } 
+}
